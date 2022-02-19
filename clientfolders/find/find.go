@@ -28,10 +28,13 @@ func Find(directory string, patterns []string, action Action) ([]string, error) 
 		path := strings.Join([]string{directory, name}, string(os.PathSeparator))
 
 		if lastLevel {
-			err = action(path)
-			if err != nil {
-				return nil, fmt.Errorf("could not execute callback: %w", err)
+			if action != nil {
+				err = action(path)
+				if err != nil {
+					return nil, fmt.Errorf("could not execute callback: %w", err)
+				}
 			}
+
 			filteredFiles = append(filteredFiles, path)
 		} else if file.IsDir() {
 			subfiles, err := Find(path, patterns[1:], action)

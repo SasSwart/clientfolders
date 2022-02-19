@@ -63,8 +63,6 @@ func CopyCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&rootArgs.Target, "target", "", "")
-
 	parent.AddCommand(&cmd)
 
 	return &cmd
