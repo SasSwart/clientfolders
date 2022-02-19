@@ -1,13 +1,11 @@
 # workflow name
 name: Generate release-artifacts
 
-# on events
 on:
-  release:
-    types: 
-        - created
+  push:
+    tags:
+      - "v*.*.*"
 
-# workflow tasks
 jobs:
   generate:
     name: Generate cross-platform builds
@@ -23,3 +21,8 @@ jobs:
         run: go version
       - name: Generate build files
         run: make build
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build
