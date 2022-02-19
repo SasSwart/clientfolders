@@ -27,6 +27,7 @@ func RootCmdFactory(logger *zap.Logger) *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&rootArgs.GroupPattern, "group", ".*", "")
 	rootCmd.PersistentFlags().StringVar(&rootArgs.EntityPattern, "entity", ".*", "")
 	rootCmd.PersistentFlags().StringVar(&rootArgs.YearPattern, "year", "\\d\\d\\d\\d", "")
+	rootCmd.PersistentFlags().StringVar(&rootArgs.Target, "target", "", "directory to copy to")
 
 	return &rootCmd
 }
