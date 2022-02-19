@@ -18,5 +18,6 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v2.2.0
       - name: Generate build files
-        run: |
-          make build
+        run: go version
+      - name: Generate build files
+        run: make build
