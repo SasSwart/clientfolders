@@ -1,0 +1,5 @@
+# Ignore the build directory. These should never be checked in
+build
+
+# Ignore common binaries that are built by accident
+main
