@@ -20,9 +20,8 @@ jobs:
       - name: Show go version
         run: go version
       - name: Generate build files
-        run: make build
+        run: make build.zip
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            build
+          files: build.zip

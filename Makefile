@@ -1,5 +1,8 @@
 APP_GO_FILES := $(shell find . -name '*.go')
 
+build.zip: build
+	zip build build
+	
 build: build/linux_amd64/clientfolders build/windows_amd64/clientfolders.exe
 
 build/linux_amd64/clientfolders: $(APP_GO_FILES)
