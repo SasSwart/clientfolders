@@ -1,7 +1,12 @@
 APP_GO_FILES := $(shell find . -name '*.go')
 
-build.zip: build LICENSE
-	zip -r build build LICENSE
+all: build windows.zip linux.zip
+
+windows.zip: build/windows_amd64/clientfolders.exe LICENSE
+	zip -r windows build/windows_amd64/clientfolders.exe LICENSE
+
+linux.zip: build/linux_amd64/clientfolders LICENSE
+	zip -r linux build/linux_amd64/clientfolders LICENSE
 
 build: build/linux_amd64/clientfolders build/windows_amd64/clientfolders.exe
 
