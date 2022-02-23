@@ -42,16 +42,16 @@ func CopyCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
 	return &cmd
 }
 
-func NewCopyAction(logger zap.Logger, args Args) func(path string) error {
-	return func(path string) error {
+func NewCopyAction(logger zap.Logger, args Args) find.Action {
+	return func(path string, errchan chan error) {
 		destination := strings.ReplaceAll(path, args.Source, args.Target)
 		logger.Info(fmt.Sprintf("Copying %s to %s", path, destination))
 
 		err := copy.Copy(destination, path)
 		if err != nil {
-			return err
+			errchan <- err
 		}
 
-		return nil
+		errchan <- nil
 	}
 }

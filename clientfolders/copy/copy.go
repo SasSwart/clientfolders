@@ -42,14 +42,14 @@ func Copy(destination, source string) error {
 }
 
 func CopyDir(target, source string) error {
-	_, err := find.Find(source, []string{".*"}, func(path string) error {
+	_, err := find.Find(source, []string{".*"}, func(path string, errchan chan error) {
 		destination := strings.ReplaceAll(path, source, target)
 		err := Copy(destination, path)
 		if err != nil {
-			return err
+			errchan <- err
 		}
 
-		return nil
+		errchan <- nil
 	})
 	if err != nil {
 		return fmt.Errorf("could not copy directory: %w", err)
