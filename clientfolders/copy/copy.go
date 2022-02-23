@@ -43,7 +43,7 @@ func Copy(destination, source string) error {
 }
 
 func CopyDir(target, source string) error {
-	_, err := find.Find(source, []string{".*"}, func(path string, errchan chan error) {
+	filesChan, errChan := find.Find(source, []string{".*"}, func(path string, errchan chan error) {
 		destination := strings.ReplaceAll(path, source, target)
 		err := Copy(destination, path)
 		if err != nil {
@@ -52,10 +52,12 @@ func CopyDir(target, source string) error {
 
 		errchan <- nil
 	})
-	if err != nil {
+	select {
+	case <-filesChan:
+		return nil
+	case err := <-errChan:
 		return fmt.Errorf("could not copy directory: %w", err)
 	}
-	return nil
 }
 
 func CopyFile(destination, source string) error {
