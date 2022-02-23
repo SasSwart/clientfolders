@@ -11,7 +11,8 @@ import (
 )
 
 func Copy(destination, source string) error {
-	err := os.MkdirAll(filepath.Dir(destination), os.ModePerm)
+	parentDirectory := strings.TrimSpace(filepath.Dir(destination))
+	err := os.MkdirAll(parentDirectory, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("could not create destination parent directories: %w", err)
 	}
