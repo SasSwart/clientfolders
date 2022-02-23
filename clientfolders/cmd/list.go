@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/sasswart/clientfolders/clientfolders/debug"
 	"github.com/sasswart/clientfolders/clientfolders/find"
 	"github.com/spf13/cobra"
@@ -36,10 +38,21 @@ func list(logger *zap.Logger) {
 	)
 
 	patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
-	files, _ := find.Find(rootArgs.Source, patterns, nil)
+	subfiles, errChan := find.Find(rootArgs.Source, patterns, nil)
 
-	logger.Info(
-		"Found files",
-		zap.Strings("files", files),
-	)
+	select {
+	case files := <-subfiles:
+		logger.Info(
+			"Found files",
+			zap.Strings("files", files),
+		)
+		return
+	case err := <-errChan:
+		logger.Error(
+			"could not list files",
+			zap.Error(fmt.Errorf("could not list files: %w", err)),
+		)
+		return
+	}
+
 }

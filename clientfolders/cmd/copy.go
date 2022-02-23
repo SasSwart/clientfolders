@@ -40,17 +40,20 @@ func copy(logger *zap.Logger) {
 	action := NewCopyAction(*logger, rootArgs)
 
 	patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
-	files, err := find.Find(rootArgs.Source, patterns, action)
-	if err != nil {
-		logger.Error(
-			"Could not copy files:",
-			zap.Error(fmt.Errorf("could not copy files: %w", err)),
+	subfiles, errChan := find.Find(rootArgs.Source, patterns, action)
+
+	var files []string
+	var err error
+	select {
+	case subfiles <- files:
+		logger.Info(
+			"Found files",
+			zap.Strings("files", files),
 		)
+	case errChan <- err:
+		errChan <- fmt.Errorf("could not copy files: %w", err)
+		return
 	}
-	logger.Info(
-		"Found files",
-		zap.Strings("files", files),
-	)
 }
 
 func NewCopyAction(logger zap.Logger, args Args) find.Action {
