@@ -11,6 +11,9 @@ type Args struct {
 	EntityPattern string
 	YearPattern   string
 	Target        string
+	Debug         struct {
+		Profile bool
+	}
 }
 
 var rootArgs Args = Args{}
@@ -28,6 +31,7 @@ func RootCmdFactory(logger *zap.Logger) *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&rootArgs.EntityPattern, "entity", ".*", "")
 	rootCmd.PersistentFlags().StringVar(&rootArgs.YearPattern, "year", "\\d\\d\\d\\d", "")
 	rootCmd.PersistentFlags().StringVar(&rootArgs.Target, "target", "", "directory to copy to")
+	rootCmd.PersistentFlags().BoolVar(&rootArgs.Debug.Profile, "profile", false, "whether to generate cpu and memory profiles")
 
 	return &rootCmd
 }

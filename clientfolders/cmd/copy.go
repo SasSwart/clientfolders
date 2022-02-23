@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sasswart/clientfolders/clientfolders/copy"
+	copypkg "github.com/sasswart/clientfolders/clientfolders/copy"
+	"github.com/sasswart/clientfolders/clientfolders/debug"
 	"github.com/sasswart/clientfolders/clientfolders/find"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -15,25 +16,13 @@ func CopyCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
 		Use:   "copy",
 		Short: "Copy a list of files that match a given list of search criteria",
 		Run: func(cmd *cobra.Command, args []string) {
-			logger.Info(
-				"Running with Root Arguments:",
-				zap.Any("source", rootArgs),
-			)
-
-			action := NewCopyAction(*logger, rootArgs)
-
-			patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
-			files, err := find.Find(rootArgs.Source, patterns, action)
-			if err != nil {
-				logger.Error(
-					"Could not copy files:",
-					zap.Error(fmt.Errorf("could not copy files: %w", err)),
-				)
+			if rootArgs.Debug.Profile {
+				debug.Profile(func() {
+					copy(logger)
+				})
+			} else {
+				copy(logger)
 			}
-			logger.Info(
-				"Found files",
-				zap.Strings("files", files),
-			)
 		},
 	}
 
@@ -42,12 +31,34 @@ func CopyCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
 	return &cmd
 }
 
+func copy(logger *zap.Logger) {
+	logger.Info(
+		"Running with Root Arguments:",
+		zap.Any("source", rootArgs),
+	)
+
+	action := NewCopyAction(*logger, rootArgs)
+
+	patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
+	files, err := find.Find(rootArgs.Source, patterns, action)
+	if err != nil {
+		logger.Error(
+			"Could not copy files:",
+			zap.Error(fmt.Errorf("could not copy files: %w", err)),
+		)
+	}
+	logger.Info(
+		"Found files",
+		zap.Strings("files", files),
+	)
+}
+
 func NewCopyAction(logger zap.Logger, args Args) find.Action {
 	return func(path string, errchan chan error) {
 		destination := strings.ReplaceAll(path, args.Source, args.Target)
 		logger.Info(fmt.Sprintf("Copying %s to %s", path, destination))
 
-		err := copy.Copy(destination, path)
+		err := copypkg.Copy(destination, path)
 		if err != nil {
 			errchan <- err
 		}
