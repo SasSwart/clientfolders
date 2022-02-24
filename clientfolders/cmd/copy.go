@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	copypkg "github.com/sasswart/clientfolders/clientfolders/copy"
 	"github.com/sasswart/clientfolders/clientfolders/debug"
+	file "github.com/sasswart/clientfolders/clientfolders/file"
 	"github.com/sasswart/clientfolders/clientfolders/find"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -61,7 +61,7 @@ func NewCopyAction(logger zap.Logger, args Args) find.Action {
 		destination := strings.ReplaceAll(path, args.Source, args.Target)
 		logger.Info(fmt.Sprintf("Copying %s to %s", path, destination))
 
-		err := copypkg.Copy(destination, path)
+		err := file.Copy(destination, path)
 		if err != nil {
 			errchan <- err
 		}
