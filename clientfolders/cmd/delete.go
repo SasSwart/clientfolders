@@ -11,17 +11,17 @@ import (
 	"go.uber.org/zap"
 )
 
-func CopyCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
+func DeleteCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
 	cmd := cobra.Command{
-		Use:   "copy",
-		Short: "Copy a list of files that match a given list of search criteria",
+		Use:   "delete",
+		Short: "Delete a list of files that match a given list of search criteria",
 		Run: func(cmd *cobra.Command, args []string) {
 			if rootArgs.Debug.Profile {
 				debug.Profile(func() {
-					copy(logger)
+					delete(logger)
 				})
 			} else {
-				copy(logger)
+				delete(logger)
 			}
 		},
 	}
@@ -31,13 +31,13 @@ func CopyCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
 	return &cmd
 }
 
-func copy(logger *zap.Logger) {
+func delete(logger *zap.Logger) {
 	logger.Info(
 		"Running with Root Arguments:",
 		zap.Any("source", rootArgs),
 	)
 
-	action := NewCopyAction(*logger, rootArgs)
+	action := NewDeleteAction(*logger, rootArgs)
 
 	subfilesChan := make(chan []string)
 	subErrChan := make(chan error)
@@ -52,18 +52,18 @@ func copy(logger *zap.Logger) {
 		)
 	case err := <-subErrChan:
 		logger.Error(
-			"Could not copy files",
-			zap.Error(fmt.Errorf("could not copy files: %w", err)),
+			"Could not delete files",
+			zap.Error(fmt.Errorf("could not delete files: %w", err)),
 		)
 	}
 }
 
-func NewCopyAction(logger zap.Logger, args Args) find.Action {
+func NewDeleteAction(logger zap.Logger, args Args) find.Action {
 	return func(path string, errchan chan error) {
 		destination := strings.ReplaceAll(path, args.Source, args.Target)
-		logger.Info(fmt.Sprintf("Copying %s to %s", path, destination))
+		logger.Info(fmt.Sprintf("Deleting %s to %s", path, destination))
 
-		err := file.Copy(destination, path)
+		err := file.Delete(destination)
 		if err != nil {
 			errchan <- err
 		}

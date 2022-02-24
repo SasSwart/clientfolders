@@ -37,17 +37,19 @@ func list(logger *zap.Logger) {
 		zap.Any("source", rootArgs),
 	)
 
+	subfilesChan := make(chan []string)
+	subErrChan := make(chan error)
 	patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
-	subfiles, errChan := find.Find(rootArgs.Source, patterns, nil)
+	find.Find(rootArgs.Source, patterns, nil, subfilesChan, subErrChan)
 
 	select {
-	case files := <-subfiles:
+	case files := <-subfilesChan:
 		logger.Info(
 			"Found files",
 			zap.Strings("files", files),
 		)
 		return
-	case err := <-errChan:
+	case err := <-subErrChan:
 		logger.Error(
 			"could not list files",
 			zap.Error(fmt.Errorf("could not list files: %w", err)),
