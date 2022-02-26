@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/sasswart/clientfolders/clientfolders/debug"
 	"github.com/sasswart/clientfolders/clientfolders/file"
@@ -60,10 +59,9 @@ func delete(logger *zap.Logger) {
 
 func NewDeleteAction(logger zap.Logger, args Args) find.Action {
 	return func(path string, errchan chan error) {
-		destination := strings.ReplaceAll(path, args.Source, args.Target)
-		logger.Info(fmt.Sprintf("Deleting %s to %s", path, destination))
+		logger.Info(fmt.Sprintf("Deleting %s", path))
 
-		err := file.Delete(destination)
+		err := file.Delete(path)
 		if err != nil {
 			errchan <- err
 		}

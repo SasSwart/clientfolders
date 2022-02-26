@@ -33,7 +33,7 @@ func DeleteDir(source string) error {
 	subfilesChan := make(chan []string)
 	subErrChan := make(chan error)
 	find.Find(source, []string{".*"}, func(path string, errchan chan error) {
-		err := Delete(source)
+		err := Delete(path)
 		if err != nil {
 			errchan <- err
 		}

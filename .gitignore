@@ -1,5 +1,5 @@
-# Ignore the build directory. These should never be checked in
+# Ignore commond build and debug artifacts
 build
-
-# Ignore common binaries that are built by accident
 main
+*.zip
+*.prof
