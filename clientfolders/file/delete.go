@@ -28,22 +28,20 @@ func Delete(source string) error {
 }
 
 func DeleteDir(source string) error {
-	subfilesChan := make(chan []string)
 	subErrChan := make(chan error)
-	Find(source, []string{".*"}, func(path string, errchan chan error) {
+	Find(source, []string{".*"}, func(path string) (interface{}, error) {
 		err := Delete(path)
 		if err != nil {
-			errchan <- err
+			return nil, err
 		}
 
-		errchan <- nil
-	}, subfilesChan, subErrChan)
-	select {
-	case <-subfilesChan:
-		return nil
-	case err := <-subErrChan:
+		return nil, nil
+	}, nil, subErrChan)
+
+	if err := <-subErrChan; err != nil {
 		return fmt.Errorf("could not delete directory: %w", err)
 	}
+	return nil
 }
 
 func DeleteFile(source string) error {

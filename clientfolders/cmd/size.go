@@ -9,19 +9,17 @@ import (
 	"go.uber.org/zap"
 )
 
-func ListCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
-
+func SizeCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
 	cmd := cobra.Command{
-		Use:   "list",
-		Short: "Find a list of files that match a given list of search criteria",
-		Long:  `Useful as a test or dry run to see which files will be acted on before running archive or delete`,
+		Use:   "size",
+		Short: "Size a list of files that match a given list of search criteria",
 		Run: func(cmd *cobra.Command, args []string) {
 			if rootArgs.Debug.Profile {
 				debug.Profile(func() {
-					list(logger)
+					size(logger)
 				})
 			} else {
-				list(logger)
+				size(logger)
 			}
 		},
 	}
@@ -31,13 +29,13 @@ func ListCmdFactory(logger *zap.Logger, parent *cobra.Command) *cobra.Command {
 	return &cmd
 }
 
-func list(logger *zap.Logger) {
+func size(logger *zap.Logger) {
 	logger.Info(
 		"Running with Root Arguments:",
 		zap.Any("source", rootArgs),
 	)
 
-	action := NewListAction(*logger, rootArgs)
+	action := NewSizeAction(*logger, rootArgs)
 
 	subfilesChan := make(chan []interface{})
 	subErrChan := make(chan error)
@@ -46,22 +44,28 @@ func list(logger *zap.Logger) {
 
 	select {
 	case files := <-subfilesChan:
-		logger.Info(
-			"Found files",
-			zap.Any("files", files),
-		)
-		return
+		var total int64
+		for _, file := range files {
+			total += file.(int64)
+		}
+		fmt.Printf("Total Size: %d bytes\n", total)
 	case err := <-subErrChan:
 		logger.Error(
-			"could not list files",
-			zap.Error(fmt.Errorf("could not list files: %w", err)),
+			"Could not size files",
+			zap.Error(fmt.Errorf("could not size files: %w", err)),
 		)
-		return
 	}
 }
 
-func NewListAction(logger zap.Logger, args Args) file.Action {
+func NewSizeAction(logger zap.Logger, args Args) file.Action {
 	return func(path string) (interface{}, error) {
-		return path, nil
+		logger.Info(fmt.Sprintf("Sizing %s", path))
+
+		size, err := file.Size(path)
+		if err != nil {
+			return nil, err
+		}
+
+		return size, nil
 	}
 }
