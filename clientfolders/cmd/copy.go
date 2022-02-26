@@ -38,7 +38,7 @@ func copy(logger *zap.Logger) {
 
 	action := NewCopyAction(*logger, rootArgs)
 
-	subfilesChan := make(chan []string)
+	subfilesChan := make(chan []interface{})
 	subErrChan := make(chan error)
 	patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
 	file.Find(rootArgs.Source, patterns, action, subfilesChan, subErrChan)
@@ -47,7 +47,7 @@ func copy(logger *zap.Logger) {
 	case files := <-subfilesChan:
 		logger.Info(
 			"Found files",
-			zap.Strings("files", files),
+			zap.Any("files", files),
 		)
 	case err := <-subErrChan:
 		logger.Error(
@@ -58,15 +58,15 @@ func copy(logger *zap.Logger) {
 }
 
 func NewCopyAction(logger zap.Logger, args Args) file.Action {
-	return func(path string, errchan chan error) {
+	return func(path string) (interface{}, error) {
 		destination := strings.ReplaceAll(path, args.Source, args.Target)
 		logger.Info(fmt.Sprintf("Copying %s to %s", path, destination))
 
 		err := file.Copy(destination, path)
 		if err != nil {
-			errchan <- err
+			return nil, err
 		}
 
-		errchan <- nil
+		return nil, nil
 	}
 }

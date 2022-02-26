@@ -17,6 +17,8 @@ func main() {
 	rootCmd := cmd.RootCmdFactory(logger)
 	cmd.ListCmdFactory(logger, rootCmd)
 	cmd.CopyCmdFactory(logger, rootCmd)
+	cmd.SizeCmdFactory(logger, rootCmd)
+	cmd.DeleteCmdFactory(logger, rootCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

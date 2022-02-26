@@ -37,7 +37,7 @@ func delete(logger *zap.Logger) {
 
 	action := NewDeleteAction(*logger, rootArgs)
 
-	subfilesChan := make(chan []string)
+	subfilesChan := make(chan []interface{})
 	subErrChan := make(chan error)
 	patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
 	file.Find(rootArgs.Source, patterns, action, subfilesChan, subErrChan)
@@ -45,8 +45,8 @@ func delete(logger *zap.Logger) {
 	select {
 	case files := <-subfilesChan:
 		logger.Info(
-			"Found files",
-			zap.Strings("files", files),
+			"Deleted files",
+			zap.Any("files", files),
 		)
 	case err := <-subErrChan:
 		logger.Error(
@@ -57,14 +57,14 @@ func delete(logger *zap.Logger) {
 }
 
 func NewDeleteAction(logger zap.Logger, args Args) file.Action {
-	return func(path string, errchan chan error) {
+	return func(path string) (interface{}, error) {
 		logger.Info(fmt.Sprintf("Deleting %s", path))
 
 		err := file.Delete(path)
 		if err != nil {
-			errchan <- err
+			return nil, err
 		}
 
-		errchan <- nil
+		return nil, nil
 	}
 }

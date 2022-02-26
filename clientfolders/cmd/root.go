@@ -27,11 +27,14 @@ func RootCmdFactory(logger *zap.Logger) *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().StringVar(&rootArgs.Source, "source", "", "clientfolders directory")
+	rootCmd.PersistentFlags().StringVar(&rootArgs.Target, "target", "", "directory to copy to")
+
 	rootCmd.PersistentFlags().StringVar(&rootArgs.GroupPattern, "group", ".*", "")
 	rootCmd.PersistentFlags().StringVar(&rootArgs.EntityPattern, "entity", ".*", "")
 	rootCmd.PersistentFlags().StringVar(&rootArgs.YearPattern, "year", "\\d\\d\\d\\d", "")
-	rootCmd.PersistentFlags().StringVar(&rootArgs.Target, "target", "", "directory to copy to")
+
 	rootCmd.PersistentFlags().BoolVar(&rootArgs.Debug.Profile, "profile", false, "whether to generate cpu and memory profiles")
+	rootCmd.PersistentFlags().StringVar(&rootArgs.Debug.LogLevel, "log-level", "error", "specify log verbosity. Options: Error, Info")
 
 	return &rootCmd
 }
