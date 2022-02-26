@@ -6,7 +6,6 @@ import (
 
 	"github.com/sasswart/clientfolders/clientfolders/debug"
 	"github.com/sasswart/clientfolders/clientfolders/file"
-	"github.com/sasswart/clientfolders/clientfolders/find"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -42,7 +41,7 @@ func copy(logger *zap.Logger) {
 	subfilesChan := make(chan []string)
 	subErrChan := make(chan error)
 	patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
-	find.Find(rootArgs.Source, patterns, action, subfilesChan, subErrChan)
+	file.Find(rootArgs.Source, patterns, action, subfilesChan, subErrChan)
 
 	select {
 	case files := <-subfilesChan:
@@ -58,7 +57,7 @@ func copy(logger *zap.Logger) {
 	}
 }
 
-func NewCopyAction(logger zap.Logger, args Args) find.Action {
+func NewCopyAction(logger zap.Logger, args Args) file.Action {
 	return func(path string, errchan chan error) {
 		destination := strings.ReplaceAll(path, args.Source, args.Target)
 		logger.Info(fmt.Sprintf("Copying %s to %s", path, destination))

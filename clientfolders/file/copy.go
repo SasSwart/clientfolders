@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/sasswart/clientfolders/clientfolders/find"
 )
 
 func Copy(destination, source string) error {
@@ -45,7 +43,7 @@ func Copy(destination, source string) error {
 func CopyDir(target, source string) error {
 	subfilesChan := make(chan []string)
 	subErrChan := make(chan error)
-	find.Find(source, []string{".*"}, func(path string, errchan chan error) {
+	Find(source, []string{".*"}, func(path string, errchan chan error) {
 		destination := strings.ReplaceAll(path, source, target)
 		err := Copy(destination, path)
 		if err != nil {

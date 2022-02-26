@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sasswart/clientfolders/clientfolders/debug"
-	"github.com/sasswart/clientfolders/clientfolders/find"
+	"github.com/sasswart/clientfolders/clientfolders/file"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -40,7 +40,7 @@ func list(logger *zap.Logger) {
 	subfilesChan := make(chan []string)
 	subErrChan := make(chan error)
 	patterns := []string{rootArgs.GroupPattern, rootArgs.EntityPattern, rootArgs.YearPattern}
-	find.Find(rootArgs.Source, patterns, nil, subfilesChan, subErrChan)
+	file.Find(rootArgs.Source, patterns, nil, subfilesChan, subErrChan)
 
 	select {
 	case files := <-subfilesChan:

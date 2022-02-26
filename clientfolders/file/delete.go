@@ -3,8 +3,6 @@ package file
 import (
 	"fmt"
 	"os"
-
-	"github.com/sasswart/clientfolders/clientfolders/find"
 )
 
 func Delete(source string) error {
@@ -32,7 +30,7 @@ func Delete(source string) error {
 func DeleteDir(source string) error {
 	subfilesChan := make(chan []string)
 	subErrChan := make(chan error)
-	find.Find(source, []string{".*"}, func(path string, errchan chan error) {
+	Find(source, []string{".*"}, func(path string, errchan chan error) {
 		err := Delete(path)
 		if err != nil {
 			errchan <- err
